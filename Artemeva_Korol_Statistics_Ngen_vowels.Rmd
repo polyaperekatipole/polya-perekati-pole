@@ -1,0 +1,214 @@
+---
+Tatiana Korol, Polina Artemeva
+Final Statistics Project
+---
+##Hypothesis:
+
+This research is dedicated to help with establishing phonetic inventory for Ngen language (South < South-East < Mande < Niger-Congo). Languages of South-East Mande group often has nasalized vowels and are easy to hear with some humble training, but not easy to be analysed by computer. So it’s assumed that difference between F1 and F2 levels in nasalized and not nasalized vowels exists and can be depicted at diagram because of the difference in F1 and F2 characteristics.
+
+##Research design:
+
+H0 = F1 and F2 of nasalized and not nasalized vowels are the same
+H1 = F1 and F2 of nasalized and not nasalized vowels differs significantly
+
+###Data:
+
+Audio files collected in expedition in 2019 in Cote-D’Ivoire were annotated and segregated to list of  15 examples. (Full list can be observed in annex (https://raw.githubusercontent.com/polyaperekatipole/polya-perekati-pole/master/annex_ngen_project.Rmd)) 
+
+15 annotated examples of each nasalized and not nasalized vowels (a, i, u, e, o, ɛ, ɔ and a̰, ḭ, ṵ, ɛ̰, ɔ̰) were annotated.  Annotation was made at Praat software with audio .wav files collected. 
+Data contains parameters: soundname (name of audio file), intervalname (name of phonetic realization of vowel), F1 (Number in Hz for the 1st formant), F2 (Number in Hz for the 2nd formant), F3 (Number in Hz for the 3rd formant)
+ 
+ 
+###Statistical methods: 
+
+- T-test for F1’s of /a/ and /a̰/, /i/ and /ḭ/ etc.
+- T-test for F2’s of /a/ and /a̰/, /i/ and /ḭ/ etc.
+- Logistic Regression 
+
+
+
+
+```{r}
+
+Sys.setlocale(locale="English")
+
+library(ggplot2)
+
+df <- read.csv('https://raw.githubusercontent.com/polyaperekatipole/polya-perekati-pole/master/mdd_result2.txt', sep = "\t", encoding = "UTF-8", stringsAsFactors = FALSE) 
+#This file is made by Praat script analisator of dataset annotated by Polina
+
+els = c('p', 'k', 'r', 'd', 'm', 'n', 'f', 'l', 't', 'z','b', 's', 'g', 'v', 'ɲ', 'ŋ', 'n') #Consonants are not taken into account 
+for (el in els) {
+  df = subset(df, intervalname!=el)
+}
+
+#Addition of binomial variable column "nasal"
+df$nasal = 1
+nasals = c('a','i','u','o','ɔ','ɛ','e')
+df[which(df[,2] %in% nasals), 7] <- 0
+head(df, n = 10)
+
+df
+
+#Data visualisation
+ggplot(data = df, aes(F2, F1, color = intervalname , label = intervalname ))+
+geom_point()+
+stat_ellipse()+
+scale_y_reverse(position = "right")+
+scale_x_reverse(position = "top")
+```
+
+```{r}
+
+#Segregation of nasal vowels
+nasal_vowels <- df
+nasals = c('a','i','u','o','ɔ','ɛ','e')
+for (al in nasals) {
+  nasal_vowels= subset(nasal_vowels, intervalname!=al)
+}
+
+nasal_vowels
+
+#Nasal vowels visualisation
+ggplot(data = nasal_vowels, aes(F2, F1, color = intervalname , label = intervalname ))+
+geom_point()+
+stat_ellipse()+
+scale_y_reverse(position = "right")+
+scale_x_reverse(position = "top")
+
+#Segregation of oral vowels
+normal_vowels <- df
+minus = c('a̰', 'ḭ', 'ṵ', 'ɛ̰', 'ɔ̰')
+for (al in minus) {
+  normal_vowels= subset(normal_vowels, intervalname!=al)
+}
+
+normal_vowels
+
+#Oral vowels visualisation
+ggplot(data = normal_vowels, aes(F2, F1, color = intervalname , label = intervalname ))+
+geom_point()+
+stat_ellipse()+
+scale_y_reverse(position = "right")+
+scale_x_reverse(position = "top")
+```
+
+
+
+
+```{r}
+p <- ggplot(normal_vowels, aes(x=F2, y=F1, fill=intervalname)) + 
+  geom_boxplot()
+p
+
+e <- ggplot(nasal_vowels, aes(x=F2, y=F1, fill=intervalname)) + 
+  geom_boxplot()
+e
+
+s <- ggplot(df, aes(x=F2, y=F1, fill=intervalname)) + 
+  geom_boxplot()
+s
+
+### Comparison of this to visualisations shows that Nasals has wider range by F1, they are somehow "streched" by F1 axes.
+```
+
+###Logistic Regression and t-test
+
+We are using this method to predict that some sound would belong to a particular category (nasal or oral).
+
+We are checking each pair of sounds to find out the correlation of F1 and F2 in nasals and F1 and F2 in non-nasals.
+
+```{r}
+
+### Logistic regression for a & a̰
+
+a <- subset(df, intervalname == 'a')
+an <- subset(df, intervalname == 'a̰')
+a_an <- rbind(a, an)
+a_an_glm <- glm(nasal~F1+F2,data=a_an,family=binomial())
+summary(a_an_glm)
+
+### T-test for a & a̰
+a <- subset(df, intervalname == 'a')
+an <- subset(df, intervalname == 'a̰')
+t.test(a$F1,an$F1)
+t.test(a$F2, an$F2)
+
+### Results
+### Results show that predictor for F1 in regression (4.93e-07) is negative and extremly small (comparing with 5%), so the probability of accidental results of F1 for a & a̰ is also extremely small, that allows to reject Ho. As it goes to F2 results, p-value in t-test (0.7907) is higher than 5%, so we can't reject H0 and it's unclear does it influence nasality or not.
+```
+
+```{r}
+### Logistic regression for i & ḭ
+i <- subset(df, intervalname == 'i')
+iin <- subset(df, intervalname == 'ḭ')
+i_iin <- rbind(i, iin)
+i_iin_glm <- glm(nasal~F1+F2,data=i_iin,family=binomial())
+summary(i_iin_glm)
+plot(a_an_glm)
+
+### T-test for i & ḭ
+i <- subset(df, intervalname == 'i')
+iin <- subset(df, intervalname == 'ḭ')
+t.test(i$F1,iin$F1)
+t.test(i$F2,iin$F2)
+
+### Results
+### Results show that predictor for F1 in regression (0.0200) is positive and not really significant (comparing with 5% and results of a & a̰) in addition F1 p-value = 0.006947 is less than 5% , so the probability of accidental results of F1 for i & ḭ is rather small, that allows to reject Ho. As it goes to F2 results,it's rather high, so we can't reject H0 and it's unclear does it influence nasality or not.
+```
+
+```{r}
+### Logistic regression for u & ṵ
+u <- subset(df, intervalname == 'u')
+un <- subset(df, intervalname == 'ṵ')
+u_un <- rbind(u, un)
+u_un_glm <- glm(nasal~F1+F2,data=u_un,family=binomial())
+summary(u_un_glm)
+plot(a_an_glm)
+
+### T-test for u & ṵ
+
+t.test(u$F1,un$F1)
+t.test(u$F2,un$F2)
+
+### Results
+### Results show that predictor for F1 in regression (0.7343) is positive and higher than 5%, in addition F1 p-value =  0.5529  approximately equal to 5% , so the probability of accidental results of F1 for i & ḭ is rather high, that doesn't allow us to reject Ho. As it goes to F2 results, it is first time lower than 5% in t-test, but for regression it's 0.0625 that is higher than 5%, so we don't treat it as sufficient proof of dependence between F2 and nasality.
+#To sum up, for u & ṵ there is no dependence between F1 or/and F2 and nasality.
+```
+
+```{r}
+### Logistic regression for ɛ & ɛ̰
+e <- subset(df, intervalname == 'ɛ')
+en <- subset(df, intervalname == 'ɛ̰')
+e_en <- rbind(e, en)
+e_en_glm <- glm(nasal~F1+F2,data=e_en,family=binomial())
+summary(e_en_glm)
+plot(e_en_glm)
+
+### T-test for ɛ & ɛ̰
+t.test(e$F1,en$F1)
+t.test(e$F2,en$F2)
+
+### Results
+### Results show that predictor for F1 in regression (0.00057) is negative and extremly small (comparing with 5% as well as t-test p-value = 3.644e-05), so the probability of accidental results of F1 for ɛ & ɛ̰ ̰ is also extremely small, that allows to reject Ho. As it goes to F2 results, p-value in t-test (0.626407) is higher than 5%, so we can't reject H0 and it's unclear does it influence nasality or not. To sum up, for ɛ & ɛ̰ there is not accidental dependence in F1 range as well as F2.
+```
+
+```{r}
+### Logistic regression for ɔ & ɔ̰
+o <- subset(df, intervalname == 'ɔ')
+on <- subset(df, intervalname == 'ɔ̰')
+o_on <- rbind(o, on)
+o_on_glm <- glm(nasal~F1+F2,data=o_on,family=binomial())
+summary(o_on_glm)
+ 
+### T-test for ɔ & ɔ̰
+t.test(o$F1,on$F1)
+t.test(o$F2,on$F2)
+
+### Results
+### Results show that predictor for F1 in regression (0.439) is negative and higher than 5%, in addition F1 p-value =  0.08082  higher than 5% , so the probability of accidental results of F1 for i & ḭ is rather high, that doesn't allow us to reject Ho. As it goes to F2 results, it is 0.430 in regression and p-value = 0.105.It's higher than 5%, so we don't treat it as sufficient proof of dependence between F2 and nasality.
+#To sum up, for  ɔ & ɔ̰ dependence of F1/F2 and nasality was not attested.
+```
+### Results:
+
+Unfortunately, looking at the results we cannot say that our H0 is not rejected. Since p-values of each regression result vary inconsistently, it is impossible to state that F1 and F2 can be distinguished through this statistical method. So, we are saying that H0 holds for [u], [o], [e], but not for [a] and [i]. Probably further research with larger number of examples could throw light at reasons of such a dependence or even change it to much more definitive.
