@@ -1,0 +1,53 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+Annex
+
+gű pàlàŋ -	2 houses
+zȕmá pàlàŋ  -	2 finfish
+lɛ̋ (pàlàŋ) -	2 mouths
+dő pālāŋ -	2 termits
+gò dó	 - a basket
+beleŋ	 - a chair
+ɲɔ̰̀pḭ́ -	a fly
+pɔ̰̀lɔ̰̀nḭ́	 - a heart
+pùpű (do)	 - a herb
+kḭ́ná̰ -	a lie
+kí	 - a notebook
+bȁ	 - a rope
+sɔ̀sɔ́ -	beans
+sɔ́	 - between
+tìì -	black
+gɔ̋	 - breast
+nɛ́nɛ́  -	cold
+vɛ̀lɛ̀mɛ̀  -	dry season
+ti̋nɛ̋	 - far
+drɔ̀drɔ̀  -	fog
+gbɔ̰̄	 - honey
+fófó -	light
+tútú -	long
+àmá̰gò -	mango
+gbĩnĩ gbɛ̃nɛ̃ -	manioc and to wait
+ɲɔ̰̏	 - rain
+bóbó -	silent
+ziŋ	 - skin
+màŋ̀àní -	taro
+Mɛnɛ ne mɛnɛ nɛ mɛla	 - The chicken bit the snake
+ȁkɔ̀ -	three
+sílé  -	to call
+ɲɛ̀rɛ̀nɛ́  -	to dig
+lő -	to go
+nṵ́ nṵ̀ṵ́  -	to go up
+nà̰mà̰là̰ -	to lie
+pélɛ́ -	to speak
+zɛ̋	 - to tap
+fe̋	 - today
+pala palaŋ	 - two houses
+ni̋ŋ pālāŋ níŋ pālāŋ -	two shadows, two noses
+fɛ̏	 - wants
+trɛ́	 - yams
+ta taa	 - grass, spear
+
+ 
